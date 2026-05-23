@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sovereign Codex</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#080608;--black2:#0e0b0f;--black3:#161218;
+  --crimson:#8b1a1a;--crimson-light:#c0392b;--crimson-glow:#e74c3c;
+  --gold:#c9a84c;--gold-light:#e8cc7a;--gold-dim:#8a6f2e;
+  --cream:#f0e6cc;--cream-dim:#c8b48a;--text:#e8d5b0;
+  --night-bg:#06050a;--night-bg2:#0b0a12;
+  --night-purple:#7c5cbf;--night-purple-dim:#4a3878;--night-star:#c8bfe8;
+  --water:#5bb8d4;--water-dim:rgba(91,184,212,0.15);
+  --coin:#f4c430;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'EB Garamond',serif;min-height:100vh;overflow-x:hidden;transition:background 1s;}
+body.night-mode{background:var(--night-bg);--gold:#9b8fd4;--gold-light:#c8bfe8;--gold-dim:#5a4a8a;--crimson:#2a1f4a;--crimson-light:#7c5cbf;--text:#d8cef0;--cream:#e8e0f8;--cream-dim:#a89ac8;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:100;opacity:0.3;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;transition:all 1s;background:radial-gradient(ellipse at 15% 15%,rgba(139,26,26,0.12) 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(201,168,76,0.08) 0%,transparent 50%);}
+body.night-mode::after{background:radial-gradient(ellipse at 20% 20%,rgba(124,92,191,0.15) 0%,transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(42,31,74,0.2) 0%,transparent 50%);}
+
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:40px 20px 80px;max-width:680px;margin:0 auto;}
+.mode-toggle{position:fixed;top:16px;right:16px;z-index:200;background:rgba(8,6,8,0.92);border:1px solid rgba(201,168,76,0.3);border-radius:30px;padding:8px 16px;cursor:pointer;font-family:'Cinzel',serif;font-size:10px;color:var(--gold);letter-spacing:2px;display:flex;align-items:center;gap:6px;transition:all 0.3s;backdrop-filter:blur(8px);}
+.mode-toggle:hover{border-color:var(--gold);}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:40px;width:100%;animation:fadeDown 0.8s ease both;}
+.crown{font-size:28px;display:block;margin-bottom:16px;animation:floatCrown 4s ease-in-out infinite;}
+@keyframes floatCrown{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.header-rule{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.header-rule::before,.header-rule::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);}
+.header-rule span{font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:4px;white-space:nowrap;}
+.main-title{font-family:'Cinzel',serif;font-size:clamp(26px,7vw,46px);font-weight:900;color:var(--gold-light);text-shadow:0 0 20px rgba(201,168,76,0.4);letter-spacing:2px;line-height:1.1;margin-bottom:8px;}
+.sub-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;color:var(--cream-dim);letter-spacing:2px;}
+.date-display{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-dim);letter-spacing:3px;margin-top:10px;}
+.night-only{display:none;}
+body.night-mode .night-only{display:block;}
+body.night-mode .day-only{display:none;}
+
+/* CARDS */
+.card{width:100%;border-radius:4px;padding:28px;margin-bottom:24px;position:relative;}
+.card-label{font-family:'Cinzel',serif;font-size:9px;color:var(--gold);letter-spacing:4px;margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.card-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gold-dim),transparent);}
+
+/* QUOTE */
+.quote-card{border:1px solid rgba(201,168,76,0.25);background:linear-gradient(135deg,rgba(14,11,15,0.95),rgba(22,18,24,0.95));padding:32px 28px;margin-bottom:24px;cursor:pointer;transition:border-color 0.3s;width:100%;border-radius:4px;position:relative;animation:fadeUp 0.8s ease 0.2s both;}
+.quote-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--crimson),var(--gold));}
+.quote-card::after{content:'↻';position:absolute;bottom:12px;right:16px;font-size:14px;color:var(--gold-dim);opacity:0.5;transition:opacity 0.2s,transform 0.3s;}
+.quote-card:hover::after{opacity:1;transform:rotate(180deg);}
+.quote-label{font-family:'Cinzel',serif;font-size:9px;color:var(--crimson-light);letter-spacing:4px;margin-bottom:16px;display:block;}
+.quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(19px,4vw,24px);font-style:italic;font-weight:300;color:var(--cream);line-height:1.6;margin-bottom:14px;}
+.quote-attr{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);letter-spacing:2px;}
+.quote-hint{font-size:11px;color:var(--gold-dim);font-style:italic;margin-top:10px;opacity:0.6;}
+
+/* AFFIRMATION */
+.affirmation-card{width:100%;background:linear-gradient(135deg,rgba(139,26,26,0.15),rgba(14,11,15,0.9));border:1px solid rgba(139,26,26,0.3);border-radius:4px;padding:28px;margin-bottom:24px;text-align:center;position:relative;animation:fadeUp 0.8s ease 0.35s both;}
+body.night-mode .affirmation-card{background:linear-gradient(135deg,rgba(42,31,74,0.3),rgba(6,5,10,0.9));border-color:rgba(124,92,191,0.3);}
+.affirmation-card::before,.affirmation-card::after{content:'◆';position:absolute;color:var(--crimson-light);font-size:10px;top:12px;}
+.affirmation-card::before{left:16px;}.affirmation-card::after{right:16px;}
+.affirmation-label{font-family:'Cinzel',serif;font-size:9px;color:var(--gold);letter-spacing:4px;margin-bottom:16px;display:block;}
+.affirmation-text{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,5vw,30px);font-weight:600;color:var(--gold-light);line-height:1.4;}
+
+/* INTENTION */
+.intention-card{border:1px solid rgba(201,168,76,0.2);background:var(--black2);animation:fadeUp 0.8s ease 0.5s both;}
+.intention-input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(201,168,76,0.2);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;padding:10px 0;margin-bottom:14px;outline:none;transition:border-color 0.3s;caret-color:var(--gold);}
+.intention-input:focus{border-bottom-color:var(--gold);}
+.intention-input::placeholder{color:rgba(200,180,138,0.3);}
+
+/* DARE */
+.dare-card{border:1px solid rgba(139,26,26,0.4);background:linear-gradient(135deg,rgba(20,6,6,0.98),rgba(14,11,15,0.98));animation:fadeUp 0.8s ease 0.6s both;}
+.dare-card .card-label{color:var(--crimson-light);}
+.dare-card .card-label::after{background:linear-gradient(90deg,var(--crimson),transparent);}
+.dare-subtitle{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--cream-dim);opacity:0.55;margin-bottom:16px;margin-top:-10px;}
+.dare-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.dare-bullet{color:var(--crimson-light);font-size:18px;flex-shrink:0;}
+.dare-input{flex:1;background:transparent;border:none;border-bottom:1px solid rgba(139,26,26,0.22);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;padding:8px 0;outline:none;caret-color:var(--crimson-light);transition:border-color 0.3s;}
+.dare-input:focus{border-bottom-color:var(--crimson-light);}
+.dare-input::placeholder{color:rgba(192,57,43,0.22);}
+
+/* MOOD */
+.mood-card{border:1px solid rgba(201,168,76,0.2);background:var(--black2);animation:fadeUp 0.8s ease 0.65s both;}
+.mood-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+.mood-btn{background:transparent;border:1px solid rgba(201,168,76,0.15);border-radius:6px;padding:12px 8px;cursor:pointer;transition:all 0.25s;text-align:center;font-family:'Cormorant Garamond',serif;color:var(--cream-dim);font-size:13px;}
+.mood-btn .mood-emoji{font-size:20px;display:block;margin-bottom:6px;}
+.mood-btn.selected{border-color:var(--gold);background:rgba(201,168,76,0.1);color:var(--gold-light);}
+.mood-response{margin-top:16px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--cream-dim);min-height:24px;transition:opacity 0.4s;line-height:1.5;}
+
+/* POWER WORDS */
+.power-card{border:1px solid rgba(139,26,26,0.25);background:linear-gradient(135deg,rgba(22,18,24,0.98),rgba(14,11,15,0.98));animation:fadeUp 0.8s ease 0.8s both;}
+.power-words{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;}
+.power-word{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;padding:8px 16px;border:1px solid rgba(139,26,26,0.4);border-radius:2px;color:var(--crimson-light);cursor:pointer;transition:all 0.25s;user-select:none;}
+.power-word.claimed{background:rgba(139,26,26,0.2);border-color:var(--crimson-glow);color:var(--gold-light);box-shadow:0 0 16px rgba(201,168,76,0.15);}
+.power-hint{font-size:11px;color:var(--gold-dim);font-style:italic;margin-top:14px;opacity:0.7;}
+
+/* ═══ RITUALS ═══ */
+.ritual-card{border:1px solid rgba(201,168,76,0.2);background:var(--black2);animation:fadeUp 0.8s ease 0.95s both;}
+body.night-mode .ritual-card{background:var(--night-bg2);border-color:rgba(124,92,191,0.2);}
+.ritual-section-label{font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:3px;margin-bottom:10px;display:block;}
+.ritual-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(201,168,76,0.07);cursor:pointer;transition:all 0.2s;}
+.ritual-item:last-child{border-bottom:none;}
+.ritual-check{width:20px;height:20px;border:1px solid rgba(201,168,76,0.3);border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.25s;font-size:11px;margin-top:3px;}
+.ritual-item.done .ritual-check{background:var(--gold);border-color:var(--gold);color:var(--black);}
+.ritual-body{flex:1;}
+.ritual-text{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--cream-dim);line-height:1.4;}
+.ritual-item.done .ritual-text{color:var(--gold);text-decoration:line-through;text-decoration-color:rgba(201,168,76,0.4);}
+.ritual-exercise{font-family:'Cinzel',serif;font-size:8px;color:var(--crimson-light);letter-spacing:2px;margin-top:3px;opacity:0.75;}
+.ritual-progress{font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:2px;margin-top:14px;text-align:right;}
+.ritual-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.15),transparent);margin:18px 0;}
+
+/* ═══ MOVE CARD ═══ */
+.move-card{border:1px solid rgba(231,76,60,0.3);background:linear-gradient(135deg,rgba(20,6,6,0.98),rgba(14,11,15,0.98));animation:fadeUp 0.8s ease 0.98s both;}
+.move-card .card-label{color:var(--crimson-light);}
+.move-card .card-label::after{background:linear-gradient(90deg,var(--crimson),transparent);}
+.move-slots{display:flex;flex-direction:column;gap:12px;}
+.move-slot{border:1px solid rgba(139,26,26,0.25);border-radius:6px;padding:14px 16px;position:relative;transition:all 0.25s;cursor:pointer;}
+.move-slot:hover{border-color:rgba(231,76,60,0.45);background:rgba(139,26,26,0.07);}
+.move-slot.done-move{border-color:rgba(201,168,76,0.45);background:rgba(201,168,76,0.05);}
+.move-slot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.move-time-tag{font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--crimson-light);opacity:0.75;}
+.move-slot.done-move .move-time-tag{color:var(--gold);}
+.move-check{font-size:14px;color:var(--gold);opacity:0;transition:opacity 0.2s;}
+.move-slot.done-move .move-check{opacity:1;}
+.move-name{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--cream);line-height:1.3;}
+.move-slot.done-move .move-name{color:var(--gold);text-decoration:line-through;text-decoration-color:rgba(201,168,76,0.4);}
+.move-detail{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--cream-dim);opacity:0.6;margin-top:3px;}
+.move-progress{font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:2px;margin-top:14px;text-align:right;}
+
+/* ═══ SLEEP TRACKER ═══ */
+.sleep-card{border:1px solid rgba(124,92,191,0.25);background:linear-gradient(135deg,rgba(10,8,20,0.98),rgba(6,5,10,0.98));animation:fadeUp 0.8s ease 1.18s both;}
+.sleep-card .card-label{color:var(--night-purple);}
+.sleep-card .card-label::after{background:linear-gradient(90deg,var(--night-purple-dim),transparent);}
+.sleep-time-row{display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap;}
+.sleep-field{flex:1;min-width:120px;}
+.sleep-label{font-family:'Cinzel',serif;font-size:8px;color:rgba(124,92,191,0.6);letter-spacing:2px;margin-bottom:6px;display:block;}
+.sleep-input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(124,92,191,0.2);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:18px;padding:4px 0;outline:none;caret-color:var(--night-purple);transition:border-color 0.3s;}
+.sleep-input:focus{border-bottom-color:var(--night-purple);}
+.sleep-input::placeholder{color:rgba(124,92,191,0.25);}
+.sleep-result{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;color:var(--night-star);opacity:0.8;min-height:22px;transition:opacity 0.3s;}
+
+/* ═══ CHORE GAME ═══ */
+.chore-card{border:1px solid rgba(244,196,48,0.25);background:linear-gradient(135deg,rgba(12,10,4,0.98),rgba(20,16,6,0.98));animation:fadeUp 0.8s ease 1s both;}
+.chore-card .card-label{color:var(--coin);}
+.chore-card .card-label::after{background:linear-gradient(90deg,rgba(244,196,48,0.35),transparent);}
+.chore-stats{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap;}
+.stat-pill{background:rgba(244,196,48,0.06);border:1px solid rgba(244,196,48,0.18);border-radius:20px;padding:7px 14px;font-family:'Cinzel',serif;font-size:9px;color:var(--coin);letter-spacing:2px;display:flex;align-items:center;gap:5px;}
+.stat-pill .stat-icon{font-size:15px;}
+.chore-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;}
+.chore-item{background:rgba(244,196,48,0.03);border:1px solid rgba(244,196,48,0.1);border-radius:6px;padding:14px 16px;cursor:pointer;transition:all 0.25s;position:relative;}
+.chore-item:hover{border-color:rgba(244,196,48,0.28);background:rgba(244,196,48,0.06);}
+.chore-item.done{border-color:rgba(244,196,48,0.45);background:rgba(244,196,48,0.08);}
+.chore-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.chore-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--cream);}
+.chore-item.done .chore-name{color:var(--coin);text-decoration:line-through;text-decoration-color:rgba(244,196,48,0.4);}
+.chore-done-check{color:var(--coin);font-size:16px;display:none;}
+.chore-item.done .chore-done-check{display:block;}
+.chore-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.tag-coin{font-family:'Cinzel',serif;font-size:8px;color:rgba(244,196,48,0.55);letter-spacing:1px;}
+.tag-move{font-family:'Cinzel',serif;font-size:8px;color:var(--crimson-light);letter-spacing:1px;background:rgba(139,26,26,0.12);border:1px solid rgba(139,26,26,0.2);border-radius:10px;padding:2px 7px;}
+.chore-reward{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--gold);margin-top:8px;display:none;animation:fadeUp 0.4s ease both;}
+.chore-item.done .chore-reward{display:block;}
+.level-section{margin-top:4px;}
+.level-header{display:flex;justify-content:space-between;font-family:'Cinzel',serif;font-size:9px;color:var(--coin);letter-spacing:2px;margin-bottom:8px;opacity:0.8;}
+.level-track{height:5px;background:rgba(244,196,48,0.08);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+.level-fill{height:100%;background:linear-gradient(90deg,#c9a84c,var(--coin),#f8e07a);border-radius:3px;transition:width 0.7s cubic-bezier(.22,1,.36,1);}
+.streak-line{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--gold-dim);text-align:center;}
+
+/* ═══ WATER / TUMBLER ═══ */
+.water-card{border:1px solid rgba(91,184,212,0.2);background:linear-gradient(135deg,rgba(4,12,20,0.98),rgba(8,14,20,0.98));animation:fadeUp 0.8s ease 1.05s both;}
+.water-card .card-label{color:#7ec8e3;}
+.water-card .card-label::after{background:linear-gradient(90deg,rgba(126,200,227,0.35),transparent);}
+.tumbler-layout{display:flex;align-items:flex-start;gap:20px;}
+.tumbler-svg-wrap{position:relative;flex-shrink:0;width:72px;}
+.tumbler-scale{position:absolute;right:-18px;top:10px;bottom:10px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;}
+.scale-line{width:8px;height:1px;background:rgba(126,200,227,0.3);}
+.scale-arrow{position:absolute;right:-22px;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-right:8px solid #5bb8d4;transition:top 0.5s cubic-bezier(.22,1,.36,1);}
+.tumbler-info{flex:1;min-width:0;}
+.refill-number{font-family:'Cinzel',serif;font-size:44px;font-weight:900;color:#7ec8e3;line-height:1;text-shadow:0 0 30px rgba(91,184,212,0.3);}
+.refill-label{font-family:'Cinzel',serif;font-size:9px;color:rgba(126,200,227,0.5);letter-spacing:3px;margin-bottom:14px;display:block;}
+.tumbler-btns{display:flex;gap:8px;margin-bottom:12px;}
+.t-btn{flex:1;background:transparent;border:1px solid rgba(126,200,227,0.2);color:#7ec8e3;font-family:'Cinzel',serif;font-size:12px;padding:8px 4px;cursor:pointer;border-radius:4px;transition:all 0.2s;white-space:nowrap;}
+.t-btn:hover{background:rgba(91,184,212,0.1);border-color:rgba(126,200,227,0.45);}
+.t-btn:active{transform:scale(0.97);}
+.water-level-row{display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap;}
+.water-level-label{font-family:'Cinzel',serif;font-size:9px;color:rgba(126,200,227,0.5);letter-spacing:2px;flex-shrink:0;}
+.level-dots{display:flex;gap:4px;flex-wrap:wrap;}
+.level-dot{width:12px;height:12px;border-radius:50%;border:1px solid rgba(126,200,227,0.25);cursor:pointer;transition:all 0.2s;background:transparent;flex-shrink:0;}
+.level-dot.active{background:#5bb8d4;border-color:#7ec8e3;box-shadow:0 0 8px rgba(91,184,212,0.4);}
+.water-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:rgba(126,200,227,0.4);margin-top:10px;}
+
+/* ═══ FOOD LOG ═══ */
+.food-card{border:1px solid rgba(201,168,76,0.2);background:var(--black2);animation:fadeUp 0.8s ease 1.1s both;}
+body.night-mode .food-card{background:var(--night-bg2);}
+.meal-row{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid rgba(201,168,76,0.08);}
+.meal-row:last-child{border-bottom:none;}
+.meal-toggle{width:22px;height:22px;border:1px solid rgba(201,168,76,0.3);border-radius:50%;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all 0.25s;margin-top:3px;}
+.meal-toggle.eaten{background:var(--gold);border-color:var(--gold);color:var(--black);}
+.meal-body{flex:1;min-width:0;}
+.meal-name{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);letter-spacing:3px;margin-bottom:6px;}
+.meal-input{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(201,168,76,0.15);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;padding:4px 0;outline:none;transition:border-color 0.3s;caret-color:var(--gold);}
+.meal-input:focus{border-bottom-color:var(--gold);}
+.meal-input::placeholder{color:rgba(200,180,138,0.2);}
+.meal-portions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.portion-chip{display:flex;align-items:center;gap:4px;background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.12);border-radius:20px;padding:3px 10px;font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:1px;}
+.portion-chip input{background:transparent;border:none;outline:none;width:36px;color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:13px;text-align:center;caret-color:var(--gold);padding:0;}
+.portion-chip input::placeholder{color:rgba(200,180,138,0.25);}
+.meal-summary{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--gold-dim);margin-top:6px;min-height:16px;opacity:0.75;}
+
+/* WEEKLY GLOW */
+.glow-card{border:1px solid rgba(201,168,76,0.2);background:var(--black2);animation:fadeUp 0.8s ease 1.15s both;}
+body.night-mode .glow-card{background:var(--night-bg2);border-color:rgba(124,92,191,0.2);}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px;}
+.day-cell{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.day-name{font-family:'Cinzel',serif;font-size:8px;color:var(--gold-dim);letter-spacing:1px;}
+.day-dot{width:34px;height:34px;border-radius:50%;border:1px solid rgba(201,168,76,0.2);background:transparent;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;position:relative;}
+.day-dot.today{border-color:rgba(201,168,76,0.5);box-shadow:0 0 8px rgba(201,168,76,0.2);}
+.day-dot.glowing{background:rgba(201,168,76,0.15);border-color:var(--gold);box-shadow:0 0 14px rgba(201,168,76,0.3);}
+.day-dot.glowing::after{content:'✦';position:absolute;font-size:12px;color:var(--gold);}
+.glow-note-label{font-family:'Cinzel',serif;font-size:9px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:8px;display:block;}
+.glow-textarea{width:100%;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.12);border-radius:3px;color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;padding:12px;outline:none;resize:none;min-height:80px;caret-color:var(--gold);transition:border-color 0.3s;line-height:1.6;}
+.glow-textarea:focus{border-color:rgba(201,168,76,0.3);}
+.glow-textarea::placeholder{color:rgba(200,180,138,0.25);}
+.week-summary{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--gold-dim);text-align:right;margin-top:10px;}
+
+/* WIND DOWN */
+.wind-card{border:1px solid rgba(124,92,191,0.3);background:linear-gradient(135deg,rgba(15,10,30,0.98),rgba(6,5,10,0.98));animation:fadeUp 0.6s ease both;}
+.wind-card .card-label{color:var(--night-purple);}
+.wind-card .card-label::after{background:linear-gradient(90deg,var(--night-purple-dim),transparent);}
+.stars{text-align:center;font-size:16px;letter-spacing:8px;color:var(--night-purple);margin-bottom:20px;opacity:0.7;}
+.wind-prompt{font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic;color:var(--cream-dim);margin-bottom:8px;line-height:1.5;opacity:0.8;}
+.wind-textarea{width:100%;background:rgba(124,92,191,0.05);border:none;border-bottom:1px solid rgba(124,92,191,0.2);color:var(--cream);font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;padding:10px 0;outline:none;resize:none;min-height:56px;margin-bottom:20px;caret-color:var(--night-purple);transition:border-color 0.3s;line-height:1.6;}
+.wind-textarea:focus{border-bottom-color:var(--night-purple);}
+.wind-textarea::placeholder{color:rgba(168,154,200,0.25);}
+.night-affirmation{font-family:'Cormorant Garamond',serif;font-size:clamp(17px,4vw,22px);font-style:italic;font-weight:300;color:var(--night-star);line-height:1.7;text-align:center;padding:18px 0 6px;border-top:1px solid rgba(124,92,191,0.15);margin-top:4px;}
+
+/* SEAL */
+.seal{text-align:center;margin-top:10px;animation:fadeUp 0.8s ease 1.2s both;}
+.seal-text{font-family:'Cinzel',serif;font-size:10px;color:var(--gold-dim);letter-spacing:3px;display:block;margin-bottom:12px;}
+.seal-symbol{font-size:28px;display:block;color:var(--gold);text-shadow:0 0 20px rgba(201,168,76,0.4);animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;text-shadow:0 0 20px rgba(201,168,76,0.4)}50%{opacity:0.7;text-shadow:0 0 40px rgba(201,168,76,0.7)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.shimmer{animation:shimmerIn 0.4s ease;}
+@keyframes shimmerIn{0%{opacity:0;transform:translateY(4px)}100%{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--black)}::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:2px}
+</style>
+</head>
+<body>
+
+<button class="mode-toggle" onclick="toggleMode()">
+  <span id="mode-icon">🌙</span>
+  <span id="mode-label">NIGHT</span>
+</button>
+
+<div class="page">
+  <div class="header">
+    <span class="crown">♛</span>
+    <div class="header-rule"><span>✦ DAILY POWER ✦</span></div>
+    <h1 class="main-title day-only">You Already Won.</h1>
+    <h1 class="main-title night-only">Rest, Queen.</h1>
+    <p class="sub-title day-only">— they just don't know it yet —</p>
+    <p class="sub-title night-only">— you earned this silence —</p>
+    <div class="date-display" id="date-display"></div>
+  </div>
+
+  <!-- QUOTE -->
+  <div class="quote-card day-only" onclick="newQuote()">
+    <span class="quote-label">✦ TODAY'S TRUTH ✦</span>
+    <div class="quote-text" id="quote-text"></div>
+    <div class="quote-attr" id="quote-attr"></div>
+    <div class="quote-hint">tap for a new one</div>
+  </div>
+
+  <!-- AFFIRMATION -->
+  <div class="affirmation-card">
+    <span class="affirmation-label">✦ YOUR AFFIRMATION ✦</span>
+    <div class="affirmation-text" id="affirmation-text"></div>
+  </div>
+
+  <!-- INTENTION -->
+  <div class="card intention-card day-only">
+    <div class="card-label">✦ SET YOUR INTENTION</div>
+    <input class="intention-input" id="intention1" type="text" placeholder="Today I choose to..." />
+    <input class="intention-input" id="intention2" type="text" placeholder="I will not give energy to..." />
+    <input class="intention-input" id="intention3" type="text" placeholder="I am becoming someone who..." />
+  </div>
+
+  <!-- DARE -->
+  <div class="card dare-card day-only">
+    <div class="card-label">✦ DON'T YOU DARE</div>
+    <div class="dare-subtitle">things you are protecting yourself from today</div>
+    <div class="dare-row"><span class="dare-bullet">✗</span><input class="dare-input" id="dare1" type="text" placeholder="apologize for existing..." /></div>
+    <div class="dare-row"><span class="dare-bullet">✗</span><input class="dare-input" id="dare2" type="text" placeholder="shrink for someone else's comfort..." /></div>
+    <div class="dare-row"><span class="dare-bullet">✗</span><input class="dare-input" id="dare3" type="text" placeholder="waste energy on what doesn't choose you..." /></div>
+    <div class="dare-row"><span class="dare-bullet">✗</span><input class="dare-input" id="dare4" type="text" placeholder="write your own..." /></div>
+  </div>
+
+  <!-- MOOD -->
+  <div class="card mood-card day-only">
+    <div class="card-label">✦ HOW ARE YOU ARRIVING TODAY</div>
+    <div class="mood-grid">
+      <div class="mood-btn" onclick="selectMood(this,'unbothered')"><span class="mood-emoji">😶‍🌫️</span>Unbothered</div>
+      <div class="mood-btn" onclick="selectMood(this,'powerful')"><span class="mood-emoji">🔥</span>On Fire</div>
+      <div class="mood-btn" onclick="selectMood(this,'soft')"><span class="mood-emoji">🌙</span>Soft Day</div>
+      <div class="mood-btn" onclick="selectMood(this,'tired')"><span class="mood-emoji">🕯️</span>Still Here</div>
+      <div class="mood-btn" onclick="selectMood(this,'healing')"><span class="mood-emoji">🌹</span>Healing</div>
+      <div class="mood-btn" onclick="selectMood(this,'villain')"><span class="mood-emoji">🖤</span>Villain Era</div>
+    </div>
+    <div class="mood-response" id="mood-response"></div>
+  </div>
+
+  <!-- POWER WORDS -->
+  <div class="card power-card day-only">
+    <div class="card-label" style="color:var(--crimson-light)">✦ CLAIM YOUR WORDS TODAY</div>
+    <div class="power-words" id="power-words"></div>
+    <div class="power-hint">tap the ones that are yours today</div>
+  </div>
+
+  <!-- ═══ RITUALS ═══ -->
+  <div class="card ritual-card">
+    <div class="card-label">✦ TODAY'S RITUALS</div>
+
+    <span class="ritual-section-label day-only">☀ MORNING & DAY</span>
+    <div id="ritual-list-day"></div>
+
+    <div class="ritual-divider night-only" style="display:none" id="ritual-divider"></div>
+    <span class="ritual-section-label night-only">🌙 EVENING & NIGHT</span>
+    <div id="ritual-list-night"></div>
+
+    <div class="ritual-progress" id="ritual-progress">Begin your rituals ✦</div>
+  </div>
+
+  <!-- ═══ MOVE CARD ═══ -->
+  <div class="card move-card day-only">
+    <div class="card-label">✦ TODAY'S MOVES</div>
+    <div class="move-slots" id="move-slots"></div>
+    <div class="move-progress" id="move-progress">tap a move when you're done ✦</div>
+  </div>
+
+  <!-- ═══ SLEEP TRACKER ═══ -->
+  <div class="card sleep-card">
+    <div class="card-label">✦ SLEEP LOG</div>
+    <div class="sleep-time-row">
+      <div class="sleep-field">
+        <span class="sleep-label">SLEPT AT</span>
+        <input class="sleep-input" id="sleep-at" type="text" placeholder="e.g. 11:30 PM" oninput="calcSleep()" />
+      </div>
+      <div class="sleep-field">
+        <span class="sleep-label">WOKE AT</span>
+        <input class="sleep-input" id="wake-at" type="text" placeholder="e.g. 7:00 AM" oninput="calcSleep()" />
+      </div>
+    </div>
+    <div class="sleep-result" id="sleep-result"></div>
+  </div>
+
+  <!-- ═══ CHORE GAME ═══ -->
+  <div class="card chore-card day-only">
+    <div class="card-label">✦ CHORE QUEST</div>
+    <div class="chore-stats">
+      <div class="stat-pill"><span class="stat-icon">🪙</span><span id="coin-count">0</span> COINS</div>
+      <div class="stat-pill"><span class="stat-icon">🔥</span><span id="streak-count">0</span> STREAK</div>
+      <div class="stat-pill"><span class="stat-icon">⚡</span>LVL <span id="level-num">1</span></div>
+    </div>
+    <div class="chore-list" id="chore-list"></div>
+    <div class="level-section">
+      <div class="level-header">
+        <span>PROGRESS</span>
+        <span id="level-xp-label">0 / 100 XP</span>
+      </div>
+      <div class="level-track"><div class="level-fill" id="level-fill" style="width:0%"></div></div>
+      <div class="streak-line" id="streak-line">Complete a chore to begin your quest ✦</div>
+    </div>
+  </div>
+
+  <!-- ═══ WATER / TUMBLER ═══ -->
+  <div class="card water-card">
+    <div class="card-label">✦ TUMBLER TRACKER</div>
+    <div class="tumbler-layout">
+      <!-- SVG Tumbler -->
+      <div class="tumbler-svg-wrap">
+        <svg viewBox="0 0 80 120" width="80" height="120" xmlns="http://www.w3.org/2000/svg">
+          <!-- Lid -->
+          <rect x="22" y="6" width="36" height="10" rx="3" fill="none" stroke="#5bb8d4" stroke-width="2" opacity="0.8"/>
+          <!-- Body outline -->
+          <path d="M18 16 Q16 60 18 110 L62 110 Q64 60 62 16 Z" fill="none" stroke="#c0392b" stroke-width="2.5"/>
+          <!-- Water fill (dynamic) -->
+          <clipPath id="tumblerClip">
+            <path d="M18 16 Q16 60 18 110 L62 110 Q64 60 62 16 Z"/>
+          </clipPath>
+          <rect id="water-fill-rect" x="16" y="110" width="50" height="0" fill="#5bb8d4" opacity="0.35" clip-path="url(#tumblerClip)" style="transition:y 0.6s cubic-bezier(.22,1,.36,1),height 0.6s cubic-bezier(.22,1,.36,1)"/>
+          <!-- Water ripple -->
+          <ellipse id="water-ripple" cx="40" cy="110" rx="22" ry="3" fill="#7ec8e3" opacity="0.2" style="transition:cy 0.6s cubic-bezier(.22,1,.36,1)"/>
+          <!-- Scale marks on right side -->
+          <line x1="65" y1="26" x2="70" y2="26" stroke="#5bb8d4" stroke-width="1" opacity="0.4"/>
+          <line x1="65" y1="45" x2="70" y2="45" stroke="#5bb8d4" stroke-width="1" opacity="0.4"/>
+          <line x1="65" y1="64" x2="70" y2="64" stroke="#5bb8d4" stroke-width="1" opacity="0.4"/>
+          <line x1="65" y1="83" x2="70" y2="83" stroke="#5bb8d4" stroke-width="1" opacity="0.4"/>
+          <line x1="65" y1="102" x2="70" y2="102" stroke="#5bb8d4" stroke-width="1" opacity="0.4"/>
+          <!-- Arrow indicator -->
+          <polygon id="level-arrow" points="72,26 80,22 80,30" fill="#5bb8d4" style="transition:transform 0.6s cubic-bezier(.22,1,.36,1);transform-origin:72px 26px"/>
+        </svg>
+      </div>
+
+      <!-- Controls -->
+      <div class="tumbler-info">
+        <div class="refill-number" id="refill-count">0</div>
+        <span class="refill-label">REFILLS TODAY</span>
+        <div class="tumbler-btns">
+          <button class="t-btn" onclick="addRefill()">+ REFILL</button>
+          <button class="t-btn" onclick="removeRefill()">− UNDO</button>
+        </div>
+        <div class="water-level-row">
+          <span class="water-level-label">LEVEL NOW</span>
+          <div class="level-dots" id="level-dots"></div>
+        </div>
+        <div class="water-note" id="water-note">tap a dot to set current water level</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ FOOD LOG ═══ -->
+  <div class="card food-card">
+    <div class="card-label">✦ TODAY'S EATS</div>
+    <div class="meal-row">
+      <div class="meal-toggle" id="meal-toggle-0" onclick="toggleMeal(0)"></div>
+      <div class="meal-body">
+        <div class="meal-name">BREAKFAST</div>
+        <input class="meal-input" id="meal-input-0" type="text" placeholder="what did you eat?" oninput="saveState()" />
+        <div class="meal-portions">
+          <div class="portion-chip">🍚 rice <input type="text" id="p0-rice" placeholder="—" oninput="updateMealSummary(0);saveState()" /></div>
+          <div class="portion-chip">🥩 viand <input type="text" id="p0-viand" placeholder="—" oninput="updateMealSummary(0);saveState()" /></div>
+          <div class="portion-chip">💧 water <input type="text" id="p0-water" placeholder="—" oninput="updateMealSummary(0);saveState()" /></div>
+        </div>
+        <div class="meal-summary" id="meal-summary-0"></div>
+      </div>
+    </div>
+    <div class="meal-row">
+      <div class="meal-toggle" id="meal-toggle-1" onclick="toggleMeal(1)"></div>
+      <div class="meal-body">
+        <div class="meal-name">LUNCH</div>
+        <input class="meal-input" id="meal-input-1" type="text" placeholder="anything good today?" oninput="saveState()" />
+        <div class="meal-portions">
+          <div class="portion-chip">🍚 rice <input type="text" id="p1-rice" placeholder="—" oninput="updateMealSummary(1);saveState()" /></div>
+          <div class="portion-chip">🥩 viand <input type="text" id="p1-viand" placeholder="—" oninput="updateMealSummary(1);saveState()" /></div>
+          <div class="portion-chip">💧 water <input type="text" id="p1-water" placeholder="—" oninput="updateMealSummary(1);saveState()" /></div>
+        </div>
+        <div class="meal-summary" id="meal-summary-1"></div>
+      </div>
+    </div>
+    <div class="meal-row">
+      <div class="meal-toggle" id="meal-toggle-2" onclick="toggleMeal(2)"></div>
+      <div class="meal-body">
+        <div class="meal-name">DINNER</div>
+        <input class="meal-input" id="meal-input-2" type="text" placeholder="ending the day fed..." oninput="saveState()" />
+        <div class="meal-portions">
+          <div class="portion-chip">🍚 rice <input type="text" id="p2-rice" placeholder="—" oninput="updateMealSummary(2);saveState()" /></div>
+          <div class="portion-chip">🥩 viand <input type="text" id="p2-viand" placeholder="—" oninput="updateMealSummary(2);saveState()" /></div>
+          <div class="portion-chip">💧 water <input type="text" id="p2-water" placeholder="—" oninput="updateMealSummary(2);saveState()" /></div>
+        </div>
+        <div class="meal-summary" id="meal-summary-2"></div>
+      </div>
+    </div>
+    <div class="meal-row">
+      <div class="meal-toggle" id="meal-toggle-3" onclick="toggleMeal(3)"></div>
+      <div class="meal-body">
+        <div class="meal-name">SNACK / MERIENDA</div>
+        <input class="meal-input" id="meal-input-3" type="text" placeholder="munchies..." oninput="saveState()" />
+        <div class="meal-portions">
+          <div class="portion-chip">🍪 amount <input type="text" id="p3-rice" placeholder="—" oninput="updateMealSummary(3);saveState()" /></div>
+          <div class="portion-chip">💧 water <input type="text" id="p3-water" placeholder="—" oninput="updateMealSummary(3);saveState()" /></div>
+        </div>
+        <div class="meal-summary" id="meal-summary-3"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY GLOW -->
+  <div class="card glow-card">
+    <div class="card-label">✦ GLOW TRACKER</div>
+    <div class="week-grid" id="week-grid"></div>
+    <span class="glow-note-label">WHAT MADE TODAY GLOW</span>
+    <textarea class="glow-textarea" id="glow-note" placeholder="even something small counts..."></textarea>
+    <div class="week-summary" id="week-summary"></div>
+  </div>
+
+  <!-- WIND DOWN (night only) -->
+  <div class="card wind-card night-only">
+    <div class="card-label">✦ WIND DOWN</div>
+    <div class="stars">✦ ✦ ✦</div>
+    <div class="wind-prompt">What are you letting go of tonight?</div>
+    <textarea class="wind-textarea" id="wind1" placeholder="release it here..."></textarea>
+    <div class="wind-prompt">One thing you did right today:</div>
+    <textarea class="wind-textarea" id="wind2" placeholder="you showed up..."></textarea>
+    <div class="wind-prompt">Tomorrow, I will be gentle about:</div>
+    <textarea class="wind-textarea" id="wind3" placeholder="write it and let it rest..."></textarea>
+    <div class="night-affirmation" id="night-affirmation"></div>
+  </div>
+
+  <div class="seal">
+    <span class="seal-text day-only">YOU ARE THE MAIN CHARACTER</span>
+    <span class="seal-text night-only">YOU EARNED YOUR REST</span>
+    <span class="seal-symbol">⬡</span>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+// ═══ MOVES (structured: morning / afternoon / evening, no floor) ═══
+const MORNING_MOVES=[
+  {name:"Wall Push-Ups",detail:"3 sets of 12 — chest against the wall, nice and controlled"},
+  {name:"Standing March",detail:"2 minutes in place, knees high, arms pumping"},
+  {name:"Overhead Arm Circles",detail:"20 big circles forward, 20 back — wake those shoulders up"},
+  {name:"Standing Oblique Crunches",detail:"15 each side — hand behind head, elbow to knee (standing)"},
+  {name:"Chair Squats",detail:"3 sets of 10 — sit to the edge and stand back up slow"},
+  {name:"Calf Raises",detail:"3 sets of 20 at the counter — heels up, hold 2 seconds"},
+  {name:"Shoulder Taps (Standing)",detail:"Tap left shoulder with right hand, alternate — 30 reps"},
+  {name:"High Knees",detail:"30 seconds on, 15 off — do 3 rounds"},
+  {name:"Wall Sit",detail:"Hold for 30–45 seconds, 3 times — back flat against wall"},
+  {name:"Standing Hip Circles",detail:"10 big circles each direction — loosen everything up"},
+];
+const AFTERNOON_MOVES=[
+  {name:"Tricep Dips (Chair)",detail:"3 sets of 10 — hands on seat edge, lower and push back up"},
+  {name:"Standing Bicep Curls",detail:"Use water bottles — 3 sets of 15 each arm"},
+  {name:"Side Leg Raises",detail:"Standing — 20 each leg, hold the wall for balance"},
+  {name:"Step Touches",detail:"Side to side, wide and controlled — 3 minutes straight"},
+  {name:"Standing Back Extensions",detail:"Hands on lower back, lean gently back — 15 slow reps"},
+  {name:"Invisible Jump Rope",detail:"2 minutes — pretend you're jumping, same rhythm"},
+  {name:"Standing Russian Twists",detail:"Arms extended, rotate torso side to side — 30 reps"},
+  {name:"Chair Dips",detail:"3 sets of 12 — back of chair for triceps"},
+  {name:"Standing Knee Raises",detail:"Alternate knees to chest, controlled — 20 each side"},
+  {name:"Wall Push-Ups (Wide Grip)",detail:"Hands wider than shoulders — 3 sets of 12"},
+];
+const EVENING_MOVES=[
+  {name:"Standing Forward Fold",detail:"Bend from hips, let arms hang — hold 30 seconds, 3 times"},
+  {name:"Standing Quad Stretch",detail:"Hold one foot behind you, 30 sec each leg — use wall for balance"},
+  {name:"Shoulder Cross Stretch",detail:"One arm across chest, hold 20 sec each side — 3 rounds"},
+  {name:"Neck Rolls",detail:"Slow and gentle — 5 full circles each direction"},
+  {name:"Standing Spinal Twist",detail:"Feet hip-width, rotate torso slowly side to side — 20 reps"},
+  {name:"Calf Stretch at Wall",detail:"Hands on wall, one leg back — hold 30 sec each"},
+  {name:"Chest Opener",detail:"Clasp hands behind back, open chest, hold 20 sec — 3 reps"},
+  {name:"Hip Flexor Stretch (Standing)",detail:"Step one foot forward in a lunge stance — hold 30 sec each side"},
+  {name:"Side Body Stretch",detail:"One arm overhead, lean to opposite side — 20 sec each"},
+  {name:"Wrist and Ankle Rolls",detail:"10 circles each direction — all four joints"},
+];
+
+function pickMove(pool, seed){
+  const idx=Math.abs(seed)%pool.length;
+  return pool[idx];
+}
+
+const MOVE_DONE_KEY='moves_done';
+let movesDone={morning:false,afternoon:false,evening:false};
+
+function renderMoves(){
+  const now=new Date();
+  const seed=now.getFullYear()*10000+now.getMonth()*100+now.getDate();
+  const slots=[
+    {id:'morning',label:'☀ MORNING',move:pickMove(MORNING_MOVES,seed)},
+    {id:'afternoon',label:'🌤 AFTERNOON',move:pickMove(AFTERNOON_MOVES,seed+7)},
+    {id:'evening',label:'🌙 EVENING',move:pickMove(EVENING_MOVES,seed+13)},
+  ];
+  const container=document.getElementById('move-slots');
+  container.innerHTML='';
+  slots.forEach(s=>{
+    const div=document.createElement('div');
+    div.className='move-slot'+(movesDone[s.id]?' done-move':'');
+    div.id='move-'+s.id;
+    div.innerHTML=`
+      <div class="move-slot-header">
+        <span class="move-time-tag">${s.label}</span>
+        <span class="move-check">✓</span>
+      </div>
+      <div class="move-name">${s.move.name}</div>
+      <div class="move-detail">${s.move.detail}</div>`;
+    div.onclick=()=>toggleMove(s.id);
+    container.appendChild(div);
+  });
+  updateMoveProgress();
+}
+
+function toggleMove(id){
+  movesDone[id]=!movesDone[id];
+  const el=document.getElementById('move-'+id);
+  el.classList.toggle('done-move',movesDone[id]);
+  updateMoveProgress();saveState();
+}
+
+function updateMoveProgress(){
+  const count=Object.values(movesDone).filter(Boolean).length;
+  const p=document.getElementById('move-progress');
+  if(count===0)p.textContent='tap a move when you\'re done ✦';
+  else if(count===3)p.textContent='✦ ALL THREE DONE — YOU MOVED TODAY. QUEEN BEHAVIOR. ✦';
+  else p.textContent=`${count} of 3 moves complete`;
+}
+
+// ═══ SLEEP CALC ═══
+function calcSleep(){
+  const sleepVal=document.getElementById('sleep-at').value.trim();
+  const wakeVal=document.getElementById('wake-at').value.trim();
+  const result=document.getElementById('sleep-result');
+  if(!sleepVal||!wakeVal){result.textContent='';return;}
+  const parseTime=str=>{
+    const m=str.match(/(\d{1,2}):(\d{2})\s*(am|pm)?/i);
+    if(!m)return null;
+    let h=parseInt(m[1]),min=parseInt(m[2]);
+    const period=(m[3]||'').toLowerCase();
+    if(period==='pm'&&h!==12)h+=12;
+    if(period==='am'&&h===12)h=0;
+    return h*60+min;
+  };
+  const s=parseTime(sleepVal),w=parseTime(wakeVal);
+  if(s===null||w===null){result.textContent='';return;}
+  let diff=w-s;if(diff<0)diff+=1440;
+  const hrs=Math.floor(diff/60),mins=diff%60;
+  const msgs={
+    low:"that's not enough, babe. try to rest more tonight.",
+    ok:"decent, but you deserve more. aim for 7–8 next time.",
+    good:"solid sleep. your body thanks you.",
+    great:"you slept well. this is how you win days."
+  };
+  let msg=hrs<5?msgs.low:hrs<7?msgs.ok:hrs<9?msgs.good:msgs.great;
+  result.textContent=`${hrs}h ${mins>0?mins+'m ':''} of sleep — ${msg}`;
+  saveState();
+}
+
+const QUOTES=[
+  {text:"She was not built for surviving. She was built for something much harder — for living, fully, on her own terms.",attr:"— for you, on days you forget"},
+  {text:"Soft enough to feel everything. Hard enough that it costs them something to try you.",attr:"— the balance you've mastered"},
+  {text:"The silence before she speaks is the most dangerous room in the building.",attr:"— everyone who's been in it"},
+  {text:"She doesn't chase. She doesn't beg. She doesn't explain herself to people who've already decided.",attr:"— your autobiography, chapter one"},
+  {text:"You want to underestimate her. That's fine. She's used to people learning.",attr:"— a warning, dressed as a compliment"},
+  {text:"Darling, the version of you they're afraid of? That's just Tuesday.",attr:"— the truth, delivered plainly"},
+  {text:"There is power in stillness. There is war in that calm face. Most people can't tell the difference.",attr:"— on being the most dangerous person in a quiet room"},
+  {text:"She didn't become this. She just stopped hiding it.",attr:"— the only origin story that matters"},
+  {text:"She moves like she's already won. Because in every version of events, she has.",attr:"— observed, from a respectful distance"},
+  {text:"Her standards aren't high. They're just non-negotiable. There's a difference.",attr:"— a clarification she no longer bothers making"},
+  {text:"Be the woman future-you is proud of. She's watching. She's rooting for you.",attr:"— a note from ahead"},
+  {text:"Not cold. Just selective. There is a warmth she reserves for the worthy.",attr:"— on her, specifically"},
+  {text:"She is not recovering. She is not healing. She is becoming.",attr:"— the correction, once and finally"},
+  {text:"You will not dim yourself for the comfort of people who are afraid of light.",attr:"— a reminder, with no exceptions"},
+  {text:"The audacity to be exactly who she is, in full, without apology — that's the whole weapon.",attr:"— what they don't teach you"},
+  {text:"She decided, at some point, that the world could take her as she was or arrange itself around her absence.",attr:"— a quiet revolution"},
+  {text:"She is not for everyone. She has made peace with this. She has, in fact, started to enjoy it.",attr:"— a development"},
+  {text:"The version of her they talk about when she leaves the room? Still not even her final form.",attr:"— a preview"},
+];
+
+const AFFIRMATIONS=[
+  "I move through today like someone who knows their worth.",
+  "I am not for everyone. I was never meant to be.",
+  "I protect my energy like the precious thing it is.",
+  "I do not shrink. I do not explain. I do not apologize for being exactly this.",
+  "Everything I need, I already carry.",
+  "I am becoming more myself every single day.",
+  "I choose peace. I choose power. I choose me.",
+  "I am the woman I used to pray to become.",
+  "My softness is not weakness. My silence is not surrender.",
+  "Today I take up space. Unapologetically. Completely.",
+  "I am not in competition with anyone. I am in a category of my own.",
+  "What is mine will find me. I don't chase. I attract.",
+];
+
+const NIGHT_AFFIRMATIONS=[
+  "You survived today. That is already enough. Sleep like someone who knows her worth.",
+  "Rest is not a reward you earn. It is something you deserve simply by being.",
+  "Let go of today completely. Tomorrow you begin again, and you will be ready.",
+  "The version of you that wakes up tomorrow is already stronger than the one who went to sleep.",
+  "You don't have to fix everything tonight. Leave it. Rest. It will still be there and so will you.",
+  "Close the day like closing a book — with intention, with peace, knowing you can return.",
+  "Everything you needed to be today, you were. Now rest, queen.",
+];
+
+const MOOD_RESPONSES={
+  unbothered:"Good. Let them wonder. Your calm is your armor and your answer. Walk into today like the outcome is already decided — because for you, it is.",
+  powerful:"Yes. This is the energy. You're not just ready — you're arriving. Everything today will feel the difference.",
+  soft:"Soft days are not weak days. You're still here, still moving, still choosing yourself. Be gentle with you today.",
+  tired:"Still here is enough. Show up as you are — that's already more than most people manage.",
+  healing:"Healing is not linear and it is not small. You are doing something extraordinary and quiet and brave.",
+  villain:"Villain era? No. Clarity era. You stopped making yourself smaller. That's not villainous — that's overdue. Proceed.",
+};
+
+const POWER_WORDS=["Unbothered","Chosen","Magnetic","Deliberate","Enough","Sovereign","Soft Power","Irreplaceable","Whole","Fearless","Radiant","Intentional","Untouchable","Worthy","Becoming"];
+const DAYS=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+// ═══ RANDOMIZED RITUALS ═══
+const DAY_RITUAL_POOL=[
+  {text:"Drink water first thing — before anything else",exercise:"10 calf raises while waiting for it to cool"},
+  {text:"Brush your teeth like you mean it",exercise:"20 shoulder rolls after"},
+  {text:"Wash your face",exercise:"10 neck stretches side to side"},
+  {text:"Take a shower or half bath",exercise:"10 standing side stretches after"},
+  {text:"Change into a fresh set of clothes",exercise:"5 big arm circles each side"},
+  {text:"Eat something — you deserve to be fed",exercise:"10 standing marches in place"},
+  {text:"Open a window. Let air in.",exercise:"10 deep breaths with arms raised"},
+  {text:"Put your phone down for 10 minutes",exercise:"15 jumping jacks during those 10 minutes"},
+  {text:"Fix your space — just the one spot that bothers you",exercise:"10 standing torso twists"},
+  {text:"Write down one thing you're looking forward to",exercise:"10 wrist rolls each hand"},
+  {text:"Look in the mirror and mean it",exercise:"10 slow neck rolls"},
+  {text:"Eat a full meal, sitting down",exercise:"10 ankle circles after"},
+  {text:"Step outside, even just for 2 minutes",exercise:"15 standing calf raises outside"},
+  {text:"Charge your devices before they die",exercise:"10 shoulder shrugs while plugging in"},
+  {text:"Send that one message you've been putting off",exercise:"10 finger stretches after typing"},
+  {text:"Drink a full glass or tumbler of water mid-day",exercise:"10 jumping jacks right after"},
+  {text:"Take 3 deep breaths before opening any app",exercise:"5 full breath holds — breathe in, hold 4 sec, out"},
+  {text:"Tidy one surface — desk, bed, or floor",exercise:"10 standing squats while tidying"},
+];
+
+const NIGHT_RITUAL_POOL=[
+  {text:"Brush your teeth before bed",exercise:"10 slow neck rolls after"},
+  {text:"Wash your face — end the day clean",exercise:"5 shoulder rolls each side"},
+  {text:"Take a bath or wipe down if too tired",exercise:"10 standing stretches before"},
+  {text:"Charge your phone somewhere not your pillow",exercise:"10 wrist and finger stretches"},
+  {text:"Drink water before you sleep",exercise:"10 slow calf raises"},
+  {text:"Change into comfortable sleep clothes",exercise:"10 gentle arm swings"},
+  {text:"Put your devices on silent",exercise:"5 deep breaths while doing it"},
+  {text:"Write one thing you're grateful for today",exercise:"10 shoulder shrugs while thinking"},
+  {text:"Close all the apps you won't need tonight",exercise:"10 blink exercises — rest your eyes"},
+  {text:"Stretch for 2 minutes — standing only",exercise:"10 side bends each side"},
+  {text:"Set tomorrow's alarm",exercise:"10 slow neck tilts while doing it"},
+  {text:"Make your sleeping space comfortable",exercise:"10 standing leg swings each leg"},
+  {text:"Forgive yourself for today — out loud or in writing",exercise:"5 full deep breaths, slow"},
+  {text:"Review what you did today, even the small things",exercise:"10 standing hip circles"},
+  {text:"Put tomorrow's clothes ready if you can",exercise:"10 arm raises while deciding"},
+];
+
+function pickRituals(pool, n, seed){
+  // deterministic daily shuffle using date seed
+  const arr=[...pool];
+  let s=seed;
+  for(let i=arr.length-1;i>0;i--){
+    s=(s*1664525+1013904223)&0xffffffff;
+    const j=Math.abs(s)%(i+1);
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr.slice(0,n);
+}
+
+// ═══ CHORES ═══
+const CHORES=[
+  {name:"Cook rice",coins:15,xp:15,exercise:"10 jumping jacks while waiting",reward:"Look at you feeding yourself. That's not small — that's care."},
+  {name:"Wash the dishes",coins:20,xp:20,exercise:"15 standing calf raises at the sink",reward:"Clean dishes, clean mind. You run this kitchen."},
+  {name:"Update Digital Express page",coins:25,xp:25,exercise:"10 wrist rolls each hand after typing",reward:"Business handled. You're basically a CEO right now."},
+  {name:"Sweep the floor",coins:20,xp:20,exercise:"10 side bends each side while sweeping",reward:"You just changed the energy of this whole space."},
+  {name:"Cook a meal",coins:30,xp:30,exercise:"15 standing marches in place while waiting",reward:"You cooked. That's love made physical. Eat well, queen."},
+  {name:"Write a diary entry",coins:15,xp:15,exercise:"10 shoulder rolls before and after",reward:"You documented yourself. That matters more than you think."},
+  {name:"Feed the dogs",coins:15,xp:15,exercise:"10 jumping jacks right after",reward:"They love you unconditionally. You just earned that back."},
+  {name:"Tidy your room a little",coins:20,xp:20,exercise:"10 standing squats while picking things up",reward:"You made your space match your energy. Immaculate."},
+  {name:"Do laundry",coins:25,xp:25,exercise:"15 arm circles while sorting clothes",reward:"Fresh clothes incoming. You are that person."},
+  {name:"Wipe down surfaces",coins:15,xp:15,exercise:"10 torso twists while wiping",reward:"Clean surfaces, clear head. You just upgraded your whole vibe."},
+];
+
+const PAMPER_STREAKS=[
+  "One chore done. That's how it starts.",
+  "Two down. You're on a roll and you don't even realize it.",
+  "Three chores. You're running the whole operation today.",
+  "Four done. At this point you're just showing off.",
+  "Five chores. Unstoppable doesn't begin to cover it.",
+  "Six?! Who gave you permission to be this productive.",
+  "Seven chores. You are literally the main character of today.",
+  "All done. The universe bows. The dogs are proud. So am I.",
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentQuoteIdx=0, isNightMode=false;
+let coins=0, xp=0, level=1, choreStreak=0;
+let tumblerRefills=0, tumblerLevel=5; // 0=empty, 10=full
+let todayRitualsDay=[], todayRitualsNight=[];
+
+function init(){
+  const now=new Date();
+  document.getElementById('date-display').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+
+  currentQuoteIdx=Math.floor(Math.random()*QUOTES.length);
+  renderQuote();
+
+  const doy=Math.floor((now-new Date(now.getFullYear(),0,0))/86400000);
+  document.getElementById('affirmation-text').textContent=AFFIRMATIONS[doy%AFFIRMATIONS.length];
+  document.getElementById('night-affirmation').textContent=NIGHT_AFFIRMATIONS[doy%NIGHT_AFFIRMATIONS.length];
+
+  // Pick daily rituals using date as seed
+  const dateSeed=now.getFullYear()*10000+now.getMonth()*100+now.getDate();
+  todayRitualsDay=pickRituals(DAY_RITUAL_POOL,5,dateSeed);
+  todayRitualsNight=pickRituals(NIGHT_RITUAL_POOL,4,dateSeed+1);
+
+  renderPowerWords();
+  renderRituals();
+  renderMoves();
+  renderChores();
+  renderTumblerDots();
+  renderWeekGrid();
+  loadState();
+
+  if(now.getHours()>=19||now.getHours()<6) enableNightMode(true);
+}
+
+// ═══ QUOTE ═══
+function renderQuote(){
+  const q=QUOTES[currentQuoteIdx];
+  const el=document.getElementById('quote-text');
+  el.textContent=`"${q.text}"`;
+  document.getElementById('quote-attr').textContent=q.attr;
+  el.classList.remove('shimmer');void el.offsetWidth;el.classList.add('shimmer');
+}
+function newQuote(){currentQuoteIdx=(currentQuoteIdx+1)%QUOTES.length;renderQuote();}
+
+// ═══ POWER WORDS ═══
+function renderPowerWords(){
+  const c=document.getElementById('power-words');c.innerHTML='';
+  POWER_WORDS.forEach(w=>{
+    const el=document.createElement('span');el.className='power-word';el.textContent=w;
+    el.onclick=()=>{el.classList.toggle('claimed');saveState();};
+    c.appendChild(el);
+  });
+}
+
+// ═══ MOOD ═══
+function selectMood(el,mood){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  const resp=document.getElementById('mood-response');
+  resp.style.opacity='0';
+  setTimeout(()=>{resp.textContent=MOOD_RESPONSES[mood];resp.style.opacity='1';},200);
+  saveState();
+}
+
+// ═══ RITUALS ═══
+function renderRituals(){
+  renderRitualList('ritual-list-day',todayRitualsDay,'d');
+  renderRitualList('ritual-list-night',todayRitualsNight,'n');
+  updateRitualProgress();
+}
+
+function renderRitualList(containerId, rituals, prefix){
+  const list=document.getElementById(containerId);list.innerHTML='';
+  rituals.forEach((r,i)=>{
+    const id=`${prefix}${i}`;
+    const item=document.createElement('div');
+    item.className='ritual-item';item.id=`ritual-${id}`;
+    item.innerHTML=`
+      <div class="ritual-check" id="check-${id}"></div>
+      <div class="ritual-body">
+        <div class="ritual-text">${r.text}</div>
+      </div>`;
+    item.onclick=()=>toggleRitual(id);
+    list.appendChild(item);
+  });
+}
+
+function toggleRitual(id){
+  const item=document.getElementById(`ritual-${id}`);
+  const check=document.getElementById(`check-${id}`);
+  const done=item.classList.toggle('done');
+  check.textContent=done?'✓':'';
+  updateRitualProgress();saveState();
+}
+
+function updateRitualProgress(){
+  const total=todayRitualsDay.length+todayRitualsNight.length;
+  const done=document.querySelectorAll('.ritual-item.done').length;
+  const p=document.getElementById('ritual-progress');
+  if(done===0){p.textContent='Begin your rituals ✦';}
+  else if(done===total){p.textContent=`✦ ALL ${total} COMPLETE — YOU SHOWED UP FOR YOURSELF ✦`;}
+  else{p.textContent=`${done} of ${total} complete`;}
+}
+
+// ═══ CHORES ═══
+function renderChores(){
+  const list=document.getElementById('chore-list');list.innerHTML='';
+  CHORES.forEach((c,i)=>{
+    const item=document.createElement('div');
+    item.className='chore-item';item.id=`chore-${i}`;
+    item.innerHTML=`
+      <div class="chore-header">
+        <div class="chore-name">${c.name}</div>
+        <div class="chore-done-check">✓</div>
+      </div>
+      <div class="chore-tags">
+        <span class="tag-coin">🪙 ${c.coins} coins · ⚡ ${c.xp} xp</span>
+      </div>
+      <div class="chore-reward">${c.reward}</div>`;
+    item.onclick=()=>toggleChore(i);
+    list.appendChild(item);
+  });
+  updateChoreStats();
+}
+
+function toggleChore(i){
+  const item=document.getElementById(`chore-${i}`);
+  const wasDone=item.classList.contains('done');
+  item.classList.toggle('done');
+  if(!wasDone){
+    coins+=CHORES[i].coins;
+    xp+=CHORES[i].xp;
+    choreStreak++;
+  } else {
+    coins=Math.max(0,coins-CHORES[i].coins);
+    xp=Math.max(0,xp-CHORES[i].xp);
+    choreStreak=Math.max(0,choreStreak-1);
+  }
+  updateChoreStats();saveState();saveStreak();
+}
+
+function updateChoreStats(){
+  document.getElementById('coin-count').textContent=coins;
+  document.getElementById('streak-count').textContent=choreStreak;
+
+  const xpPerLevel=100;
+  level=Math.floor(xp/xpPerLevel)+1;
+  const xpInLevel=xp%(xpPerLevel);
+  const pct=Math.min(100,(xpInLevel/xpPerLevel)*100);
+
+  document.getElementById('level-num').textContent=level;
+  document.getElementById('level-xp-label').textContent=`${xpInLevel} / ${xpPerLevel} XP`;
+  document.getElementById('level-fill').style.width=pct+'%';
+
+  const idx=Math.min(choreStreak,PAMPER_STREAKS.length-1);
+  document.getElementById('streak-line').textContent=choreStreak>0?PAMPER_STREAKS[idx]:'Complete a chore to begin your quest ✦';
+}
+
+// ═══ TUMBLER ═══
+function renderTumblerDots(){
+  const wrap=document.getElementById('level-dots');wrap.innerHTML='';
+  for(let i=1;i<=10;i++){
+    const d=document.createElement('div');
+    d.className='level-dot'+(i<=tumblerLevel?' active':'');
+    d.onclick=(()=>{const lv=i;return()=>setTumblerLevel(lv);})(i);
+    wrap.appendChild(d);
+  }
+  updateTumblerSVG();
+}
+
+function setTumblerLevel(lv){
+  tumblerLevel=lv;
+  renderTumblerDots();
+  updateWaterNote();
+  saveState();
+}
+
+function addRefill(){
+  tumblerRefills++;
+  tumblerLevel=10; // refill = full
+  document.getElementById('refill-count').textContent=tumblerRefills;
+  renderTumblerDots();
+  updateWaterNote();
+  saveState();
+}
+
+function removeRefill(){
+  if(tumblerRefills>0){tumblerRefills--;document.getElementById('refill-count').textContent=tumblerRefills;}
+  saveState();
+}
+
+function updateTumblerSVG(){
+  // tumblerLevel 0=empty, 10=full
+  // SVG body from y=16 to y=110, height=94
+  const bodyTop=16, bodyBottom=110, bodyHeight=94;
+  const fillHeight=(tumblerLevel/10)*bodyHeight;
+  const fillY=bodyBottom-fillHeight;
+  const rect=document.getElementById('water-fill-rect');
+  const ripple=document.getElementById('water-ripple');
+  const arrow=document.getElementById('level-arrow');
+
+  if(rect){rect.setAttribute('y',fillY);rect.setAttribute('height',fillHeight);}
+  if(ripple){ripple.setAttribute('cy',fillY);}
+
+  // Arrow: scale marks at y=26,45,64,83,102 — map level 10..1 to these
+  const scaleY=[26,45,64,83,102];
+  const arrowIdx=Math.round((10-tumblerLevel)/10*4);
+  const clampedIdx=Math.min(4,Math.max(0,arrowIdx));
+  const targetY=scaleY[clampedIdx];
+  if(arrow){
+    arrow.setAttribute('transform',`translate(0,${targetY-26})`);
+  }
+}
+
+function updateWaterNote(){
+  const notes=["tumbler is empty — time to refill, babe","barely any left — refill soon","getting low","halfway there","more than half — doing good","almost there","almost full","so close to full","nearly full — you're hydrated and thriving","full tumbler. look at you. absolutely winning."];
+  const idx=Math.max(0,Math.min(9,tumblerLevel-1));
+  document.getElementById('water-note').textContent=notes[idx];
+}
+
+// ═══ MEALS ═══
+function toggleMeal(i){
+  const t=document.getElementById(`meal-toggle-${i}`);
+  t.classList.toggle('eaten');
+  t.textContent=t.classList.contains('eaten')?'✓':'';
+  saveState();
+}
+
+function updateMealSummary(i){
+  const riceEl=document.getElementById(`p${i}-rice`);
+  const viandEl=document.getElementById(`p${i}-viand`);
+  const waterEl=document.getElementById(`p${i}-water`);
+  const summaryEl=document.getElementById(`meal-summary-${i}`);
+  if(!summaryEl)return;
+  const parts=[];
+  if(riceEl&&riceEl.value.trim())parts.push(`rice: ${riceEl.value.trim()}`);
+  if(viandEl&&viandEl.value.trim())parts.push(`viand: ${viandEl.value.trim()}`);
+  if(waterEl&&waterEl.value.trim())parts.push(`water: ${waterEl.value.trim()}`);
+  summaryEl.textContent=parts.length?parts.join(' · '):'';
+}
+
+// ═══ WEEKLY GLOW ═══
+function renderWeekGrid(){
+  const grid=document.getElementById('week-grid');grid.innerHTML='';
+  const today=new Date(),todayIdx=today.getDay();
+  const start=new Date(today);start.setDate(today.getDate()-todayIdx);
+  const glowData=getGlowData();
+  for(let i=0;i<7;i++){
+    const d=new Date(start);d.setDate(start.getDate()+i);
+    const key=d.toDateString(),isToday=(i===todayIdx),hasGlow=glowData[key];
+    const cell=document.createElement('div');cell.className='day-cell';
+    const dot=document.createElement('div');
+    dot.className=`day-dot${isToday?' today':''}${hasGlow?' glowing':''}`;
+    dot.onclick=()=>toggleGlowDay(key,dot);
+    const name=document.createElement('div');name.className='day-name';name.textContent=DAYS[i];
+    cell.appendChild(name);cell.appendChild(dot);grid.appendChild(cell);
+  }
+  updateWeekSummary();
+}
+
+function toggleGlowDay(key,dot){
+  const data=getGlowData();
+  if(data[key]){delete data[key];dot.classList.remove('glowing');}
+  else{data[key]=true;dot.classList.add('glowing');}
+  saveGlowData(data);updateWeekSummary();
+}
+
+function updateWeekSummary(){
+  const data=getGlowData(),today=new Date(),todayIdx=today.getDay();
+  const start=new Date(today);start.setDate(today.getDate()-todayIdx);
+  let count=0;
+  for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(data[d.toDateString()])count++;}
+  const s=document.getElementById('week-summary');
+  if(count===0)s.textContent='tap a day to mark it as a glow day ✦';
+  else if(count===7)s.textContent='✦ perfect week — you showed up every single day ✦';
+  else s.textContent=`${count} glow ${count===1?'day':'days'} this week ✦`;
+}
+
+function getGlowData(){try{return JSON.parse(localStorage.getItem('glow_tracker')||'{}');}catch{return{};}}
+function saveGlowData(d){try{localStorage.setItem('glow_tracker',JSON.stringify(d));}catch{}}
+
+// ═══ MODE ═══
+function toggleMode(){enableNightMode(!isNightMode);}
+function enableNightMode(on){
+  isNightMode=on;
+  document.body.classList.toggle('night-mode',on);
+  document.getElementById('mode-icon').textContent=on?'☀️':'🌙';
+  document.getElementById('mode-label').textContent=on?'DAY':'NIGHT';
+  const divider=document.getElementById('ritual-divider');
+  if(divider)divider.style.display=on?'block':'none';
+  try{localStorage.setItem('night_mode',on?'1':'0');}catch{}
+}
+
+// ═══ SAVE / LOAD ═══
+
+// Streak lives separately — never wiped by daily reset
+function saveStreak(){
+  try{localStorage.setItem('sovereign_streak',JSON.stringify({
+    streak:choreStreak,
+    lastActiveDate:new Date().toDateString()
+  }));}catch{}
+}
+
+function loadStreak(){
+  try{
+    const raw=localStorage.getItem('sovereign_streak');
+    if(!raw)return;
+    const s=JSON.parse(raw);
+    const today=new Date().toDateString();
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    // Streak survives if last active was today or yesterday — breaks if skipped
+    if(s.lastActiveDate===today||s.lastActiveDate===yesterday){
+      choreStreak=s.streak||0;
+    } else {
+      choreStreak=0; // streak broken — skipped at least one day
+      saveStreak();
+    }
+  }catch{}
+}
+
+function saveState(){
+  const state={
+    date:new Date().toDateString(),
+    intentions:['intention1','intention2','intention3'].map(id=>{const el=document.getElementById(id);return el?el.value:''}),
+    dares:['dare1','dare2','dare3','dare4'].map(id=>{const el=document.getElementById(id);return el?el.value:''}),
+    ritualsDone:[...document.querySelectorAll('.ritual-item.done')].map(el=>el.id.replace('ritual-','')),
+    choresDone:[...document.querySelectorAll('.chore-item.done')].map(el=>el.id.replace('chore-','')),
+    coins,xp,tumblerRefills,tumblerLevel,
+    claimedWords:[...document.querySelectorAll('.power-word.claimed')].map(el=>el.textContent),
+    glowNote:document.getElementById('glow-note')?document.getElementById('glow-note').value:'',
+    wind:['wind1','wind2','wind3'].map(id=>{const el=document.getElementById(id);return el?el.value:''}),
+    moodEaten:[0,1,2,3].map(i=>document.getElementById(`meal-toggle-${i}`)?.classList.contains('eaten')||false),
+    meals:[0,1,2,3].map(i=>document.getElementById(`meal-input-${i}`)?.value||''),
+    portions:[0,1,2,3].map(i=>({
+      rice:document.getElementById(`p${i}-rice`)?.value||'',
+      viand:document.getElementById(`p${i}-viand`)?.value||'',
+      water:document.getElementById(`p${i}-water`)?.value||'',
+    })),
+    selectedMood:document.querySelector('.mood-btn.selected')?.textContent||'',
+    movesDone,
+    sleepAt:document.getElementById('sleep-at')?.value||'',
+    wakeAt:document.getElementById('wake-at')?.value||'',
+  };
+  try{localStorage.setItem('sovereign_codex_daily',JSON.stringify(state));}catch{}
+}
+
+function loadState(){
+  try{
+    const nm=localStorage.getItem('night_mode');
+    if(nm==='1')enableNightMode(true);
+
+    // Always load streak first — it persists across days
+    loadStreak();
+
+    const raw=localStorage.getItem('sovereign_codex_daily');
+    if(!raw){updateChoreStats();return;}
+    const s=JSON.parse(raw);
+    const isToday=s.date===new Date().toDateString();
+
+    if(isToday){
+      // Same day — restore everything
+      if(s.intentions)['intention1','intention2','intention3'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value=s.intentions[i]||'';});
+      if(s.dares)['dare1','dare2','dare3','dare4'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value=s.dares[i]||'';});
+      if(s.ritualsDone)s.ritualsDone.forEach(id=>{
+        const item=document.getElementById(`ritual-${id}`);
+        const check=document.getElementById(`check-${id}`);
+        if(item){item.classList.add('done');if(check)check.textContent='✓';}
+      });
+      updateRitualProgress();
+      if(s.choresDone)s.choresDone.forEach(idx=>{
+        const item=document.getElementById(`chore-${idx}`);
+        if(item)item.classList.add('done');
+      });
+      if(s.coins!==undefined)coins=s.coins;
+      if(s.xp!==undefined)xp=s.xp;
+      if(s.tumblerRefills!==undefined){tumblerRefills=s.tumblerRefills;document.getElementById('refill-count').textContent=tumblerRefills;}
+      if(s.tumblerLevel!==undefined)tumblerLevel=s.tumblerLevel;
+      renderTumblerDots();updateWaterNote();
+      if(s.claimedWords)document.querySelectorAll('.power-word').forEach(el=>{if(s.claimedWords.includes(el.textContent))el.classList.add('claimed');});
+      if(s.glowNote){const el=document.getElementById('glow-note');if(el)el.value=s.glowNote;}
+      if(s.wind)['wind1','wind2','wind3'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value=s.wind[i]||'';});
+      if(s.moodEaten)[0,1,2,3].forEach(i=>{if(s.moodEaten[i]){const t=document.getElementById(`meal-toggle-${i}`);if(t){t.classList.add('eaten');t.textContent='✓';}}});
+      if(s.meals)[0,1,2,3].forEach(i=>{const el=document.getElementById(`meal-input-${i}`);if(el)el.value=s.meals[i]||'';});
+      if(s.portions)[0,1,2,3].forEach(i=>{
+        const p=s.portions[i]||{};
+        const r=document.getElementById(`p${i}-rice`);const v=document.getElementById(`p${i}-viand`);const w=document.getElementById(`p${i}-water`);
+        if(r)r.value=p.rice||'';if(v)v.value=p.viand||'';if(w)w.value=p.water||'';
+        updateMealSummary(i);
+      });
+      if(s.movesDone){movesDone=s.movesDone;renderMoves();}
+      if(s.sleepAt){const el=document.getElementById('sleep-at');if(el)el.value=s.sleepAt;}
+      if(s.wakeAt){const el=document.getElementById('wake-at');if(el){el.value=s.wakeAt;calcSleep();}}
+    } else {
+      // New day — reset daily state, but streak already loaded above
+      renderTumblerDots();updateWaterNote();
+    }
+    updateChoreStats();
+  }catch(e){console.warn('load error',e);}
+}
+
+document.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('input',saveState));
+init();
+</script>
+</body>
+</html>
